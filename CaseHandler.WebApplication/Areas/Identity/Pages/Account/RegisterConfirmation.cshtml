@@ -1,0 +1,18 @@
+﻿@page
+@model RegisterConfirmationModel
+
+<h1>Sikeres regisztráció</h1>
+@{
+    if (@Model.DisplayConfirmAccountLink)
+    {
+        <p>
+            A regisztrációja megerősítéséhez szükséges hivatkozást elküldtük a megadott email címre.
+        </p>
+    }
+    else
+    {
+        <p>
+           Sajnáljuk, hiba történt a regisztráció során.
+        </p>
+    }
+}

@@ -1,0 +1,52 @@
+﻿@model IEnumerable<CaseHandler.WebApplication.Models.ViewModels.ListUsersViewModel>
+
+<h1>Felhasználók listája</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.UserName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Email)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.EmailConfirmed)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IsAdmin)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IsLockedOut)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id"><b>@Html.DisplayFor(modelItem => item.UserName)</b></a>                    
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Email)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.EmailConfirmed)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.IsAdmin)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.IsLockedOut)
+                </td>
+                <td>
+                    Ügyek: @item.CaseCount<br />
+                    Megjegyzések: @item.CommentCount<br />
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

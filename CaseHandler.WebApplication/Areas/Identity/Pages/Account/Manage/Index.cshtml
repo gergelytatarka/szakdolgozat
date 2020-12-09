@@ -1,0 +1,34 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["ActivePage"] = ManageNavPages.Index;
+}
+
+<h4>Profil</h4>
+<partial name="_StatusMessage" model="Model.StatusMessage" />
+<div class="row">
+    <div class="col-md-6">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="form-group">
+            <label asp-for="Username"></label>
+            <input asp-for="Username" class="form-control" disabled />
+            <label asp-for="Email"></label>
+            <input asp-for="Email" class="form-control" disabled />
+
+            <label asp-for="CommentCount"></label>
+            <input asp-for="CommentCount" type="text" class="form-control" disabled />
+
+            <label asp-for="ReportedCaseCount"></label>
+            <input asp-for="ReportedCaseCount" type="text" class="form-control" disabled />
+            @if (Model.AssignedCaseCount > 0)
+            {
+                <label asp-for="AssignedCaseCount"></label>
+                <input asp-for="AssignedCaseCount" type="text" class="form-control" disabled />
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,158 @@
+﻿@inject Microsoft.AspNetCore.Identity.UserManager<CaseHandler.WebApplication.Data.Models.ApplicationUser> UserManager
+@model CaseHandler.WebApplication.Models.ViewModels.CaseViewModel
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var applicationUser = UserManager.GetUserAsync(User).Result;
+    var caseRowClass = "";
+    var headerText = "";
+
+    switch (Model.ReturnUrl)
+    {
+        case "Index": headerText = "Minden ügy"; break;
+        case "Free": headerText = "Szabad ügyek"; break;
+        case "AssignedToMe": headerText = "Megoldandó ügyeim"; break;
+        case "Own": headerText = "Saját ügyeim"; break;
+        case "Pending": headerText = "Folyamatban lévő ügyek"; break;
+        case "Finished": headerText = "Befejezett ügyek"; break;
+        case "Blocked": headerText = "Zárolt ügyek"; break;
+    }
+    if (!string.IsNullOrWhiteSpace(Model.SearchFilter))
+    {
+        headerText = $"{headerText} - szűrési feltétel: '{Model.SearchFilter}'";
+    }
+}
+
+@if (applicationUser.IsAdmin)
+{
+    <div class="align-top">
+        <center>
+            <a asp-action="Free">Szabad ügyek</a> | <a asp-action="AssignedToMe">Megoldandó ügyeim</a> | <a asp-action="Own">Saját ügyeim</a> |
+            <a asp-action="Pending">Folyamatban lévők</a> | <a asp-action="Finished">Befejezettek</a> | <a asp-action="Blocked">Zároltak</a>
+        </center>
+    </div>
+}
+
+<h1>@headerText</h1>
+<form asp-controller="Cases" asp-action="@Model.ReturnUrl">
+    <div class="align-top">
+        <p>
+            <div class="input-group mb-3">
+                <input type="text" name="filter" class="form-control" placeholder="Keresés a részletekben..." aria-label="Keresés a részletekben..." aria-describedby="basic-addon2">
+                <div class="input-group-append">
+                    <button class="btn btn-outline-secondary" type="submit">Keresés</button>
+                </div>
+            </div>
+        </p>
+    </div>
+</form>
+
+@if (Model.CaseItems.Any())
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    <a asp-action="@Model.ReturnUrl" asp-route-sortOrder="@ViewData["SortByNumber"]">@Html.DisplayNameFor(model => model.CaseItems[0].Number)</a>
+                </th>
+                <th>
+                    <a asp-action="@Model.ReturnUrl" asp-route-sortOrder="@ViewData["SortBySummary"]">@Html.DisplayNameFor(model => model.CaseItems[0].Summary)</a>
+                </th>
+                <th>
+                    <a asp-action="@Model.ReturnUrl" asp-route-sortOrder="@ViewData["SortByType"]">@Html.DisplayNameFor(model => model.CaseItems[0].Type)</a>
+                </th>
+                <th>
+                    <a asp-action="@Model.ReturnUrl" asp-route-sortOrder="@ViewData["SortByState"]">@Html.DisplayNameFor(model => model.CaseItems[0].State)</a>
+                </th>
+                <th>
+                    <a asp-action="@Model.ReturnUrl" asp-route-sortOrder="@ViewData["SortByPriority"]">@Html.DisplayNameFor(model => model.CaseItems[0].Priority)</a>
+                </th>
+                <th>
+                    <a asp-action="@Model.ReturnUrl" asp-route-sortOrder="@ViewData["SortByAssignee"]">@Html.DisplayNameFor(model => model.CaseItems[0].Assignee)</a>
+                </th>
+                <th>
+                    <a asp-action="@Model.ReturnUrl" asp-route-sortOrder="@ViewData["SortByReportedBy"]">@Html.DisplayNameFor(model => model.CaseItems[0].ReportedBy)</a>
+                </th>
+                <th>
+                    <a asp-action="@Model.ReturnUrl" , asp-route-sortOrder="@ViewData["SortByReportedAt"]">@Html.DisplayNameFor(model => model.CaseItems[0].ReportedAt)</a>
+                </th>
+                @if (Model.ReturnUrl != "Blocked")
+                {
+                    <th>
+                        <a asp-action="@Model.ReturnUrl" , asp-route-sortOrder="@ViewData["SortByDeadline"]">@Html.DisplayNameFor(model => model.CaseItems[0].Deadline)</a>
+                    </th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.CaseItems)
+            {
+                @if (item.ReportedBy.Id == applicationUser.Id)
+                {
+                    caseRowClass = "table-active";
+                }
+                @if (item.Assignee?.Id == applicationUser.Id)
+                {
+                    caseRowClass = "table-info";
+                }
+                @if (item.Blocked)
+                {
+                    caseRowClass = "table-danger";
+                }
+                <tr class="@caseRowClass">
+                    <td>
+                        <a asp-action="Details" asp-route-id="@item.Id">@item.Number</a>
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Summary)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Type)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.State)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Priority)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Assignee.UserName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ReportedBy.UserName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ReportedAt)<br />
+                        <b>@Html.DisplayFor(modelItem => item.OpenDaysCount) nappal ezelőtt</b>
+                    </td>
+                    @if (Model.ReturnUrl != "Blocked")
+                    {
+                        <td>
+                            @if ((item.State != CaseHandler.WebApplication.Data.Enums.State.Closed || item.State != CaseHandler.WebApplication.Data.Enums.State.Resolved) && !item.Blocked)
+                            {
+                                @if (item.DaysUntilDeadline > 0)
+                                {
+                                    var formatedDeadLineDate = item.Deadline.GetValueOrDefault().ToShortDateString();
+                                    @Html.DisplayFor(modelItem => formatedDeadLineDate)<br />
+                                    <b>@Html.DisplayFor(modelItem => item.DaysUntilDeadline) @Html.Raw(" nap múlva")</b>
+                                }
+                                else if (item.Deadline != null)
+                                {
+                                    <b class="text-danger">@Html.Raw("Lejárt a határidő")</b>
+                                }
+                                else
+                                {
+                                    @Html.Raw("Nincs beállított határidő")
+                                }
+                            }
+                        </td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>A nem található a keresésnek megfelelő ügy.</p>
+}

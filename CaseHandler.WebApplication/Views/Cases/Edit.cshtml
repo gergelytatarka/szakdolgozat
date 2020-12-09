@@ -1,0 +1,57 @@
+﻿@model CaseHandler.WebApplication.Models.RequestModels.EditCaseRequestModel
+
+@{
+    ViewData["Title"] = "Szerkesztés";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>@Model.Number azonosítójú ügy szerkesztése</h1>
+<hr />
+<div class="row">
+    <div class="col-md-8">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="ReportedById" />
+            <div class="form-group">
+                <label asp-for="Type" class="control-label"></label>
+                <select asp-for="Type" class="form-control" asp-items="Html.GetEnumSelectList<CaseHandler.WebApplication.Data.Enums.Type>()"></select>
+                <span asp-validation-for="Type" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="State" class="control-label"></label>
+                <select asp-for="State" class="form-control" asp-items="Html.GetEnumSelectList<CaseHandler.WebApplication.Data.Enums.State>()"></select>
+                <span asp-validation-for="State" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Assignee" class="control-label"></label>
+                <select asp-for="AssigneeId" class="form-control" asp-items="ViewBag.AssigneeId">
+                    <option selected>-----</option>
+                </select>
+                <span asp-validation-for="AssigneeId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Summary" class="control-label"></label>
+                <input asp-for="Summary" class="form-control" />
+                <span asp-validation-for="Summary" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Detail" class="control-label"></label>
+                <input asp-for="Detail" class="form-control" />
+                <span asp-validation-for="Detail" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Resolution" class="control-label"></label>
+                <textarea asp-for="Resolution" class="form-control"></textarea>
+                <span asp-validation-for="Resolution" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Mentés" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a href="javascript:history.back()">Vissza az előző oldalra</a>
+</div>

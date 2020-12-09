@@ -1,0 +1,72 @@
+﻿@using Microsoft.AspNetCore.Identity
+@inject SignInManager<CaseHandler.WebApplication.Data.Models.ApplicationUser> SignInManager
+@inject UserManager<CaseHandler.WebApplication.Data.Models.ApplicationUser> UserManager
+@{
+    var applicationUser = new CaseHandler.WebApplication.Data.Models.ApplicationUser();
+    @if (SignInManager.IsSignedIn(User))
+    {
+        applicationUser = UserManager.FindByNameAsync(User.Identity.Name).Result;
+    }
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ügyintéző alkalmazás</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+            <div class="container">
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index" data-placement="bottom" title="Ügyintéző alkalmazás">ÜA</a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
+                    <partial name="_LoginPartial" />
+                    @if (SignInManager.IsSignedIn(User))
+                    {@if (applicationUser.IsAdmin)
+                        {
+                            <ul class="navbar-nav flex-grow-1">
+                                <li class="nav-item">
+                                    <a class="nav-link text-info" asp-controller="Statistics" asp-action="Index" data-placement="bottom" title="">Statisztika</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-primary" asp-controller="Cases" asp-action="Index" data-placement="bottom" title="Ügyintézői menüpont adminisztrátorok számára">Ügyintézés</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-danger" asp-controller="User" asp-action="ListUsers" data-placement="bottom" title="Felhasználó kezelés">Felhasználók</a>
+                                </li>
+                            </ul>
+                        }
+                }
+                </div>
+            </div>
+        </nav>
+    </header>
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            &copy; @DateTime.Now.Year - Ügyintéző alkalmazás - <a asp-area="" asp-controller="Home" asp-action="Contact">Kapcsolat</a>
+            @if (SignInManager.IsSignedIn(User))
+            {
+                Write(" - ");
+                <a asp-area="" asp-controller="Home" asp-action="SiteMap">Oldaltérkép</a>
+            }
+        </div>
+    </footer>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

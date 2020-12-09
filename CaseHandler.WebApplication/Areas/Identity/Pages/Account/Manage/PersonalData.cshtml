@@ -1,0 +1,26 @@
+﻿@page
+@model PersonalDataModel
+@{    
+    ViewData["ActivePage"] = ManageNavPages.PersonalData;
+}
+
+<h4>Személyes adatok</h4>
+
+<div class="row">
+    <div class="col-md-6">
+        <p>A felhasználói fiókja csak olyan adatokat tartalmaz, amelyeket ön adott meg számunkra. Ezen az oldalon lehetősége nyílik ezen adatok letöltésére vagy törlésére.</p>
+        <p>
+            <strong>A fiók törlésével minden személyes adata végleg és visszaállíthatatlanul el fog veszni.</strong>
+        </p>
+        <form id="download-data" asp-page="DownloadPersonalData" method="post" class="form-group">
+            <button class="btn btn-primary" type="submit">Letöltés</button>
+        </form>
+        <p>
+            <a id="delete" asp-page="DeletePersonalData" class="btn btn-danger">Törlés</a>
+        </p>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

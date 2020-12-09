@@ -1,0 +1,219 @@
+﻿@model CaseHandler.WebApplication.Models.ViewModels.CaseDetailsViewModel
+@inject Microsoft.AspNetCore.Identity.UserManager<CaseHandler.WebApplication.Data.Models.ApplicationUser> UserManager
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var applicationUser = UserManager.FindByNameAsync(User.Identity.Name).Result;
+}
+
+<h1>Ügy részletei</h1>
+
+<div>
+    @if (Model.Blocked)
+    {
+        <div class="alert alert-warning" role="alert">
+            <p>
+                <strong>A ügy zárolva van, a hozzá tartozó paramétereken már nem lehet változtatni, új megjegyzést hozzáfűzni vagy a régieket módosítani sem lehet.<br />Ez a művelet nem visszavonható.</strong>
+            </p>
+        </div>
+    }
+    <div>
+        @if (applicationUser.IsAdmin && !Model.Blocked)
+        {
+            <a asp-action="Edit" asp-route-id="@Model.Id">Szerkesztés</a> @:|
+            <a asp-action="Block" asp-route-id="@Model.Id">Zárolás</a> @:|
+            <a asp-action="Delete" asp-route-id="@Model.Id">Törlés</a> @:|
+        }
+        @if (!Model.Blocked)
+        {
+            <a asp-action="Create" asp-controller="Comments" asp-route-caseId="@Model.Id">Megjegyzés hozzáadása</a> @:|
+        }
+        <a asp-action="History" asp-route-caseId="@Model.Id">Eseménynapló</a> |
+        <a href="javascript:history.back()">Vissza az előző oldalra</a>
+    </div>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Number)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Number)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Summary)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Summary)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Detail)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Detail)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Type)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Type)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.State)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.State)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Priority)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Priority)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Deadline)
+        </dt>
+        <dd class="col-sm-10">
+            @if (Model.Deadline == null || Model.Deadline == DateTime.MinValue)
+            {
+                @Html.Raw("Határidő nincs beállítva")
+            }
+            else
+            {
+                var formatedDeadLineDate = Model.Deadline.ToShortDateString();
+                @if (Model.Deadline < DateTime.Now)
+                {
+                    <b class="text-danger">@Html.DisplayFor(model => formatedDeadLineDate) @Html.Raw(" - Lejárt")</b>
+                }
+                else
+                {
+                    @Html.DisplayFor(model => formatedDeadLineDate)
+                }
+            }
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.ReportedAt)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.ReportedAt)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Assignee)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Assignee.UserName)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.ReportedBy)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.ReportedBy.UserName)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Resolution)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Resolution)
+        </dd>
+    </dl>
+</div>
+<p>
+    <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#commentsContainer" aria-expanded="false" aria-controls="collapseExample">
+        Megjegyzések mutatása
+    </button>
+    <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#notificationsContainer" aria-expanded="false" aria-controls="collapseExample">
+        Az ügyhöz tartozó értesítéseim mutatása
+    </button>
+</p>
+<div class="collapse" id="commentsContainer">
+    @if (Model.Comments.Any())
+    {
+        <div>
+            <h4>Megjegyzések</h4>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>
+                            @Html.DisplayNameFor(model => model.Comments[0].CommentedBy)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.Comments[0].Content)
+                        </th>
+                        @if (applicationUser.IsAdmin)
+                        {
+                            <th></th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Comments)
+                    {
+                        <tr>
+                            <td>
+                                <b>@Html.DisplayFor(modelItem => item.CommentedBy)</b><br />
+                                @Html.DisplayFor(modelItem => item.CommentedAt)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Content)
+                            </td>
+                            @if (applicationUser.IsAdmin && !Model.Blocked)
+                            {
+                                <td>
+                                    <a asp-action="Edit" asp-controller="Comments" asp-route-id="@item.Id">Szerkesztés</a> |
+                                    <a asp-action="Delete" asp-controller="Comments" asp-route-id="@item.Id">Delete</a>
+                                </td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <p>Az ügyhöz még nem fűzött senki sem megjegyzést.</p>
+    }
+</div>
+<div class="collapse" id="notificationsContainer">
+    @if (Model.Nofications.Any())
+    {
+        <div>
+            <h4>Az ügyhöz tartozó értesítéseim</h4>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>
+                            @Html.DisplayNameFor(model => model.Nofications[0].CreatedBy)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.Nofications[0].Entry)
+                        </th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Nofications)
+                    {
+                        <tr>
+                            <td>
+                                <b> @Html.DisplayFor(modelItem => item.CreatedBy.UserName)</b><br />
+                                @Html.DisplayFor(modelItem => item.CreatedAt)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Entry)
+                            </td>
+                            <td>
+                                @if (!item.Notified)
+                                {
+                                    <a asp-action="Notified" asp-controller="Notifications" asp-route-id="@item.Id" asp-route-redirecToCaseDetails="@true">Olvasottnak jelöl</a>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <p>Ehhez az ügyhöz nem tartozik önnek szóló értseítés.</p>
+    }
+</div>

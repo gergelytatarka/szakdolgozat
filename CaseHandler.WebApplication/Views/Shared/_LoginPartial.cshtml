@@ -1,0 +1,49 @@
+﻿@using Microsoft.AspNetCore.Identity
+@inject SignInManager<CaseHandler.WebApplication.Data.Models.ApplicationUser> SignInManager
+@inject UserManager<CaseHandler.WebApplication.Data.Models.ApplicationUser> UserManager
+@inject CaseHandler.WebApplication.Services.INotificationService NotificationService
+@{
+    var notificationLinkClass = "nav-link text-dark";
+    var notificationLinkText = $"Értesítéseim";
+    var applicationUser = new CaseHandler.WebApplication.Data.Models.ApplicationUser();
+    
+    @if (SignInManager.IsSignedIn(User))
+    {
+        applicationUser = UserManager.FindByNameAsync(User.Identity.Name).Result;
+        var unNotifiedNotificationCount = NotificationService.GetUnNotifiedNotificationCount(applicationUser.Id);
+        if (unNotifiedNotificationCount > 0)
+        {
+            notificationLinkText += $" ({unNotifiedNotificationCount})";
+            notificationLinkClass = "nav-link text-danger";
+        }
+    }
+}
+<ul class="navbar-nav">
+    @if (SignInManager.IsSignedIn(User))
+    {
+        if (!applicationUser.IsAdmin)
+        {
+            <li class="nav-item">
+                <a class="nav-link text-secondary" asp-controller="Cases" asp-action="Own" data-placement="bottom" title="Saját ügyeim">Saját Ügyeim</a>
+            </li>
+        }
+        <li class="nav-item">
+            <a class="nav-link text-primary" asp-controller="Cases" asp-action="Create" data-placement="bottom" title="Új ügy létrehozása">Új Ügy</a>
+        </li>
+        <li class="nav-item">
+            <a class="@notificationLinkClass" asp-controller="Notifications" asp-action="Index" data-placement="bottom" title="Értesítéseim megtekintése">@notificationLinkText</a>
+        </li>
+        <li class="nav-item">
+            <b><a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" data-placement="bottom" title="Saját profil szerkesztése">@applicationUser.UserName</a></b>
+        </li>
+    }
+    else
+    {
+        <li class="nav-item">
+            <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Register">Regisztráció</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Login">Bejelentkezés</a>
+        </li>
+    }
+</ul>

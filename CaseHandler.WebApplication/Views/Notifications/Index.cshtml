@@ -1,0 +1,49 @@
+﻿@model IEnumerable<CaseHandler.WebApplication.Data.Models.Notification>
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Értesítéseim</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Case)                
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CreatedBy)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Entry)
+            </th>
+            <th>&nbsp;</th>
+        </tr>
+    </thead>
+    <tbody>        
+        @foreach (var item in Model)
+        {
+        <tr>
+            <td>
+                <a asp-action="Details" asp-controller="Cases" asp-route-id="@item.CaseId">@Html.DisplayFor(modelItem => item.Case.Number)</a>                
+            </td>
+            <td>
+                <b>@Html.DisplayFor(modelItem => item.CreatedBy.UserName)</b><br />
+                @Html.DisplayFor(modelItem => item.CreatedAt)
+            </td>
+            <td>
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Entry)
+            </td>
+            <td>
+                @if (!item.Notified)
+                {
+                    <a asp-action="Notified" asp-route-id="@item.Id">Olvasottnak jelöl</a>
+                }
+            </td>
+        </tr>
+        }
+    </tbody>
+</table>

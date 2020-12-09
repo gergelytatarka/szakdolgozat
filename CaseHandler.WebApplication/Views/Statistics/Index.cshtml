@@ -1,0 +1,130 @@
+﻿@model CaseHandler.WebApplication.Models.ViewModels.CaseStatisticsViewModel
+    <center><h1>Statisztika</h1></center>
+    <div class="table-responsive">
+        <table class="table mx-auto w-auto">
+            <thead>
+                <tr>
+                    <th>Adminisztátor</th>
+                    <th class="text-center">Folyamatban lévő ügyek száma adminisztrátoronként</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.PendingCasesByAssignee)
+                {
+                    <tr>
+                        <td>
+                            @item.Key
+                        </td>
+                        <td class="text-center">
+                            @item.Value
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <center class="align-top"><b>Teljes összesítés</b></center>
+    <div class="table-responsive">
+        <table class="table mx-auto w-auto">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>
+                        Szabadok
+                    </th>
+                    <th>
+                        Folyamatban lévők
+                    </th>
+                    <th>
+                        Befejezettek
+                    </th>
+                    <th>
+                        Zároltak
+                    </th>
+                    <th>Összesen</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        Kérelmek
+                    </td>
+                    <td class="text-center">
+                        @Html.DisplayFor(model => model.AllOpenRequestCount)
+                    </td>
+                    <td class="text-center">
+                        @Html.DisplayFor(model => model.AllPendingRequestCount)
+                    </td>
+                    <td class="text-center">
+                        @Html.DisplayFor(model => model.AllFinishedRequestCount)
+                    </td>
+                    <td class="text-center">
+                        @Html.DisplayFor(model => model.AllBlockedRequestCount)
+                    </td>
+                    <td class="text-center">
+                        @Html.DisplayFor(model => model.AllRequestCount)
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Hibajelenségek
+                    </td>
+                    <td class="text-center">
+                        @Html.DisplayFor(model => model.AllOpenFailureCount)
+                    </td>
+                    <td class="text-center">
+                        @Html.DisplayFor(model => model.AllPendingFailureCount)
+                    </td>
+                    <td class="text-center">
+                        @Html.DisplayFor(model => model.AllFinishedFailureCount)
+                    </td>
+                    <td class="text-center">
+                        @Html.DisplayFor(model => model.AllBlockedFailureCount)
+                    </td>
+                    <td class="text-center">
+                        @Html.DisplayFor(model => model.AllFailureCount)
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <center class="align-top"><b>Havi összesítés ebben az évben</b></center>
+    <table class="table">
+        <thead>
+            <tr>
+                <th></th>
+                <th>Január</th>
+                <th>Február</th>
+                <th>Március</th>
+                <th>Április</th>
+                <th>Május</th>
+                <th>Június</th>
+                <th>Július</th>
+                <th>Augusztus</th>
+                <th>Szeptember</th>
+                <th>Október</th>
+                <th>November</th>
+                <th>December</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Kérelmek</td>
+                @foreach (var item in Model.MonthlyRequestThisYear)
+                {
+                    <td class="text-center">
+                        @item.Value
+                    </td>
+                }
+            </tr>
+            <tr>
+                <td>Hibajelenségek</td>
+                @foreach (var item in Model.MonthlyFailuresThisYear)
+                {
+                    <td class="text-center">
+                        @item.Value
+                    </td>
+                }
+            </tr>
+        </tbody>
+    </table>
